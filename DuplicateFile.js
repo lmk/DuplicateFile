@@ -1,44 +1,85 @@
 var dirFilter = [
 	  'Debug'
+	, 'Release'
 	, 'Doxygen'
 ];
 
 var fileFilter = [
-	  '.ojb'
+	  '.obj'
 	, '.exe'
+	, '.class'
+	, '.log'
+	, '.vcproj'
+	, '.scc'
 ];
 
 var fs = require('fs');
 
-
+var DupList = {};
 
 DuplicateFile('D:\\Source\\BSP_SDK\\NBioBSPSDK\\');
 
 
+console.log("[result]=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+
+for(var file in DupList)
+{
+	if(DupList[file].count === 1) {
+		delete DupList[file];
+	}
+}
+
+//console.log(DupList);
+
+
 
 function DuplicateFile(parentDir) {
-	fs.readdir(parentDir, function(err, files){
-		if ( err ) {
-			console.log(err);
-			return false;
-		}
+	
+	if (parentDir.substr(parentDir.length - 1) !== '\\')
+		parentDir += '\\';
+	
+	var files = fs.readdirSync(parentDir);
 		
-		for(var i in files)
-		{
-			if ( fs.lstatSync(parentDir + files[i]).isFile() ) {
-				console.log('[F] ' + files[i]);
-			} else if ( fs.lstatSync(parentDir + files[i]).isDirectory() ) {
-				if (isExcludDir(files[i])) {
-					console.log('[X] ' + files[i]);
-					continue;
-				}
-				console.log('[D] ' + files[i]);
-			} else {
-				console.log('[U] ' + files[i]);
+	for(var i in files)
+	{
+		var obj = {};
+		
+		if ( fs.lstatSync(parentDir + files[i]).isFile() ) {
+//				console.log('[F] ' + files[i]);
+			if (isExcludFile(files[i])) {
+				console.log('excluding file: ' + parentDir + files[i]);
+				continue;
 			}
+			
+			if ( DupList[files[i]] === undefined ) {
+			DupList[files[i]] = {count:1, parent:[]};
+			} else {
+				DupList[files[i]].count++;
+			}
+			var buf = parentDir.toString();
+			console.log(typeof buf);
+			buf.replace("\\","q");
+			console.log(buf);
+			DupList[files[i]].parent.push(buf.toString().replace(/\\\\/g,"\\"));
+			
+			console.log(DupList);
+			process.exit(1);
+			
+			
+		} else if ( fs.lstatSync(parentDir + files[i]).isDirectory() ) {
+			if (isExcludDir(files[i])) {
+				console.log('excluding dir: ' + parentDir + files[i]);
+				continue;
+			}
+//				console.log('[D] ' + files[i]);
+			
+				DuplicateFile(parentDir + files[i]);
+			
+		} else {
+			console.log('Unknown type: ' + files[i]);
+			process.exit(1);
 		}
-
-	});
+	}
 }
 
 	

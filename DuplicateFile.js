@@ -30,7 +30,20 @@ for(var file in DupList)
 	}
 }
 
-console.log(DupList);
+//console.log(DupList);
+
+// to CSV
+for(var file in DupList)
+{
+	for(var i=0; i<DupList[file].count; i++)
+	{
+		if (i==0) 
+			console.log(file + "," + DupList[file].count + "," + DupList[file].parent[i]);
+		else 
+			console.log(",," + DupList[file].parent[i]);
+	}
+}
+
 
 
 function DuplicateFile(parentDir) {

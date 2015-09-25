@@ -2,6 +2,7 @@ var dirFilter = [
 	  'Debug'
 	, 'Release'
 	, 'Doxygen'
+	, 'Doc'	
 ];
 
 var fileFilter = [
@@ -20,17 +21,16 @@ var DupList = {};
 DuplicateFile('D:\\Source\\BSP_SDK\\NBioBSPSDK\\');
 
 
-console.log("[result]=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+//console.log("[result]=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
 
 for(var file in DupList)
 {
-	if(DupList[file].count === 1) {
+	if(DupList[file].count <= 1) {
 		delete DupList[file];
 	}
 }
 
-//console.log(DupList);
-
+console.log(DupList);
 
 
 function DuplicateFile(parentDir) {
@@ -47,7 +47,7 @@ function DuplicateFile(parentDir) {
 		if ( fs.lstatSync(parentDir + files[i]).isFile() ) {
 //				console.log('[F] ' + files[i]);
 			if (isExcludFile(files[i])) {
-				console.log('excluding file: ' + parentDir + files[i]);
+//				console.log('excluding file: ' + parentDir + files[i]);
 				continue;
 			}
 			
@@ -56,19 +56,11 @@ function DuplicateFile(parentDir) {
 			} else {
 				DupList[files[i]].count++;
 			}
-			var buf = parentDir.toString();
-			console.log(typeof buf);
-			buf.replace("\\","q");
-			console.log(buf);
-			DupList[files[i]].parent.push(buf.toString().replace(/\\\\/g,"\\"));
-			
-			console.log(DupList);
-			process.exit(1);
-			
+			DupList[files[i]].parent.push(parentDir);
 			
 		} else if ( fs.lstatSync(parentDir + files[i]).isDirectory() ) {
 			if (isExcludDir(files[i])) {
-				console.log('excluding dir: ' + parentDir + files[i]);
+//				console.log('excluding dir: ' + parentDir + files[i]);
 				continue;
 			}
 //				console.log('[D] ' + files[i]);
